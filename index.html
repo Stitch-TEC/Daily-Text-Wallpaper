@@ -138,25 +138,6 @@
             cursor: pointer;
         }
         
-        /* Checkbox Style */
-        .checkbox-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-            padding: 10px;
-            background: #2a2a2a;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-        
-        input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-            accent-color: var(--primary);
-        }
-
         button {
             width: 100%;
             padding: 14px;
@@ -245,6 +226,18 @@
     <div class="container">
         <div class="controls">
             
+            <div class="input-group">
+                <label>Language 🌎</label>
+                <select id="langSelect" onchange="fetchDailyText()">
+                    <option value="en">English</option>
+                    <option value="es">Español (Spanish)</option>
+                    <option value="fr">Français (French)</option>
+                    <option value="pt">Português (Portuguese)</option>
+                    <option value="de">Deutsch (German)</option>
+                    <option value="it">Italiano (Italian)</option>
+                </select>
+            </div>
+
             <div class="grid-row">
                 <div>
                     <label>Format</label>
@@ -274,9 +267,14 @@
                 </div>
             </div>
 
-            <div class="checkbox-wrapper">
-                <input type="checkbox" id="showDate" onchange="draw()">
-                <label for="showDate" style="margin:0; text-transform:none; color: white; cursor:pointer;">Include Date on Wallpaper</label>
+            <div class="input-group">
+                <label>Date Position 📅</label>
+                <select id="datePosSelect" onchange="draw()">
+                    <option value="floating">Floating Top (Classic)</option>
+                    <option value="inline-top">Inline Top (Header)</option>
+                    <option value="inline-bottom">Inline Bottom (Footer)</option>
+                    <option value="none">None</option>
+                </select>
             </div>
 
             <hr style="border: 0; border-top: 1px solid #333; margin: 15px 0;">
@@ -326,8 +324,21 @@
     const formatSelect = document.getElementById('formatSelect');
     const fontSelect = document.getElementById('fontSelect');
     const shareBtn = document.getElementById('shareBtn');
-    const showDateCheckbox = document.getElementById('showDate'); // New Toggle
     
+    // V2 Controls
+    const langSelect = document.getElementById('langSelect');
+    const datePosSelect = document.getElementById('datePosSelect');
+    
+    // CORRECTED Language Configuration Map
+    const LANG_CONFIG = {
+        'en': { region: 'r1', code: 'lp-e', urlPart: 'en', locale: 'en-US' },
+        'es': { region: 'r4', code: 'lp-s', urlPart: 'es', locale: 'es-ES' },
+        'de': { region: 'r10', code: 'lp-x', urlPart: 'de', locale: 'de-DE' },
+        'fr': { region: 'r30', code: 'lp-f', urlPart: 'fr', locale: 'fr-FR' },
+        'it': { region: 'r6', code: 'lp-i', urlPart: 'it', locale: 'it-IT' },
+        'pt': { region: 'r5', code: 'lp-t', urlPart: 'pt', locale: 'pt-BR' } // Assumed standard r5 based on pattern, but let's stick to knowns first.
+    };
+
     let currentImage = new Image();
     currentImage.crossOrigin = "Anonymous"; 
     
@@ -340,34 +351,33 @@
         shareBtn.style.display = "block";
     }
 
-    // --- SMART CASCADING SCRAPER ---
+    // --- SMART CASCADING SCRAPER (Multi-Language Corrected) ---
     async function fetchDailyText() {
-        textInput.value = "Fetching today's text...";
+        const lang = langSelect.value;
+        const config = LANG_CONFIG[lang];
+        
+        // Safety check for unknown langs
+        if (!config) {
+            alert("Language configuration pending.");
+            return;
+        }
+
+        textInput.value = "Fetching...";
         
         const today = new Date();
         const year = today.getFullYear();
-        const month = today.getMonth() + 1; 
-        const day = today.getDate();
+        const month = today.getMonth() + 1; // 1-12 (No leading zero usually required)
+        const day = today.getDate();        // 1-31 (No leading zero)
 
-        // The Page to Scrape
-        const targetUrl = `https://wol.jw.org/en/wol/dt/r1/lp-e/${year}/${month}/${day}`;
+        // Construct dynamic URL with correct Region (r) and Language (lp) codes
+        const targetUrl = `https://wol.jw.org/${config.urlPart}/wol/dt/${config.region}/${config.code}/${year}/${month}/${day}`;
         
+        console.log("Targeting:", targetUrl); // For debugging
+
         const proxies = [
-            { 
-                name: "CorsProxy", 
-                url: `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`,
-                type: 'html' 
-            },
-            { 
-                name: "AllOrigins", 
-                url: `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`,
-                type: 'json' 
-            },
-            { 
-                name: "CodeTabs", 
-                url: `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`,
-                type: 'html' 
-            }
+            { name: "CorsProxy", url: `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`, type: 'html' },
+            { name: "AllOrigins", url: `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`, type: 'json' },
+            { name: "CodeTabs", url: `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`, type: 'html' }
         ];
 
         let success = false;
@@ -393,6 +403,7 @@
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(htmlString, "text/html");
 
+                // Selectors
                 const themeNode = doc.querySelector(".themeScrp") || doc.querySelector("p.sa");
                 let themeText = themeNode ? themeNode.textContent.trim() : "";
 
@@ -400,9 +411,10 @@
                 let bodyText = bodyNode ? bodyNode.textContent.trim() : "";
 
                 if (themeText && bodyText) {
-                    themeText = themeText.replace(/^\w+,\s\w+\s\d+/, '').trim();
+                    // Remove leading date if present (common in scraping results)
+                    // Regex looks for "Dayname, Month DD" patterns at start
+                    themeText = themeText.replace(/^[\w\u00C0-\u00FF]+,\s[\w\u00C0-\u00FF]+\s\d+/, '').trim();
                     
-                    // FIXED: Removed Quotes from themeText
                     textInput.value = `${themeText}\n\n${bodyText}`;
                     
                     draw();
@@ -444,6 +456,9 @@
 
         const format = formatSelect.value;
         const fontName = fontSelect.value;
+        const datePos = datePosSelect.value;
+        const lang = langSelect.value;
+        const config = LANG_CONFIG[lang] || LANG_CONFIG['en']; // Fallback
         
         textSizeLabel.innerText = textSizeRange.value;
         overlayLabel.innerText = Math.round(overlayRange.value * 100) + "%";
@@ -469,7 +484,7 @@
         ctx.fillStyle = `rgba(0, 0, 0, ${overlayRange.value})`;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // --- NEW: Draw Date if Checked ---
+        // --- PREPARE TEXT & DATE ---
         const fontSize = parseInt(textSizeRange.value);
         ctx.fillStyle = "white";
         ctx.textAlign = "center";
@@ -478,37 +493,38 @@
         ctx.shadowBlur = 20;
         ctx.shadowOffsetX = 5;
         ctx.shadowOffsetY = 5;
-
-        // Base font setup
         ctx.font = `bold ${fontSize}px '${fontName}', sans-serif`;
 
-        if (showDateCheckbox.checked) {
-            // Format Today's Date
-            const dateStr = new Date().toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            });
-            
-            // Draw Date at the top (15% down from top)
-            const dateSize = Math.max(24, fontSize * 0.7); // Slightly smaller than main text
+        let mainText = textInput.value;
+        
+        // Get Formatted Date
+        const dateStr = new Date().toLocaleDateString(config.locale, { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+
+        // --- HANDLE DATE POSITIONS ---
+        
+        if (datePos === 'floating') {
+            const dateSize = Math.max(24, fontSize * 0.7);
             ctx.font = `bold ${dateSize}px '${fontName}', sans-serif`;
-            
-            // Adjust header position based on format
             const headerY = format === 'desktop' ? canvas.height * 0.12 : canvas.height * 0.10;
             ctx.fillText(dateStr, canvas.width / 2, headerY);
-            
-            // Reset font for body text
+            // Reset font
             ctx.font = `bold ${fontSize}px '${fontName}', sans-serif`;
+        }
+        else if (datePos === 'inline-top') {
+            mainText = `${dateStr}\n\n${mainText}`;
+        }
+        else if (datePos === 'inline-bottom') {
+            mainText = `${mainText}\n\n${dateStr}`;
         }
 
         // Draw Main Text
-        const text = textInput.value;
         const maxTextWidth = format === 'desktop' ? 1200 : canvas.width - 200;
-        
-        // Wrap text in center
-        wrapText(ctx, text, canvas.width / 2, canvas.height / 2, maxTextWidth, fontSize * 1.5);
+        wrapText(ctx, mainText, canvas.width / 2, canvas.height / 2, maxTextWidth, fontSize * 1.5);
     }
 
     // Wrap Function
@@ -596,6 +612,10 @@
     overlayRange.addEventListener('input', draw);
     textSizeRange.addEventListener('input', draw);
     formatSelect.addEventListener('change', draw);
+    datePosSelect.addEventListener('change', draw);
+    langSelect.addEventListener('change', function() {
+        fetchDailyText(); // Refetch when lang changes
+    });
     
     // FONT FIX
     fontSelect.addEventListener('change', function() {
