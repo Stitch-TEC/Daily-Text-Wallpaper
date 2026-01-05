@@ -7,15 +7,16 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Lora:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Lora:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
             --primary: #4a90e2;
-            --bg: #1a1a1a;
-            --panel: #2d2d2d;
+            --bg: #121212;
+            --panel: #1e1e1e;
             --text: #ffffff;
-            --border: #444;
+            --text-muted: #888888;
+            --border: #333;
         }
 
         body {
@@ -27,34 +28,47 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 0; 
         }
 
-        h1 { margin-bottom: 20px; font-size: 1.5rem; text-align: center; color: #ddd; }
+        /* Wrapper to push footer down */
+        .main-wrapper {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            max-width: 1400px;
+        }
+
+        h1 { margin-bottom: 20px; font-size: 1.5rem; text-align: center; color: #ddd; letter-spacing: -0.5px; }
 
         .container {
             display: flex;
             flex-direction: row; 
             align-items: flex-start;
             gap: 30px;
-            max-width: 1400px;
             width: 100%;
             justify-content: center;
         }
 
+        /* --- Controls Section --- */
         .controls {
             flex: 1;
-            min-width: 300px;
+            min-width: 320px;
             max-width: 400px; 
             background: var(--panel);
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
             height: fit-content;
             position: sticky;
             top: 20px; 
+            z-index: 100;
         }
 
+        /* --- Preview Section --- */
         .preview-area {
             flex: 2;
             display: flex;
@@ -66,19 +80,28 @@
         canvas {
             max-width: 100%;
             height: auto;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
             max-height: 85vh; 
+            border: 1px solid #333;
         }
 
-        .input-group { margin-bottom: 20px; }
+        /* --- Input Elements --- */
+        .input-group { margin-bottom: 15px; }
         
+        .grid-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
         label { 
             display: block; 
-            margin-bottom: 8px; 
+            margin-bottom: 6px; 
             font-weight: 600; 
-            font-size: 0.9rem; 
-            color: #aaa; 
+            font-size: 0.75rem; 
+            color: var(--text-muted); 
             text-transform: uppercase;
             letter-spacing: 0.5px;
             display: flex;
@@ -87,28 +110,30 @@
         
         textarea, input[type="text"], select {
             width: 100%;
-            padding: 12px;
-            background: #3a3a3a;
+            padding: 10px 12px;
+            background: #2a2a2a;
             border: 1px solid var(--border);
             color: white;
             border-radius: 8px;
             box-sizing: border-box;
-            font-size: 16px; 
+            font-size: 14px; 
             font-family: inherit;
+            transition: border 0.2s;
         }
 
         textarea:focus, input:focus, select:focus {
             outline: none;
             border-color: var(--primary);
+            background: #333;
         }
         
-        textarea { resize: vertical; min-height: 120px; line-height: 1.4; }
+        textarea { resize: vertical; min-height: 100px; line-height: 1.5; }
 
         input[type=range] {
             width: 100%;
-            margin: 5px 0;
+            margin: 8px 0;
             accent-color: var(--primary);
-            height: 6px;
+            height: 4px;
             background: #444;
             border-radius: 5px;
             outline: none;
@@ -122,38 +147,71 @@
             color: white;
             border: none;
             border-radius: 8px;
-            font-size: 1rem;
-            font-weight: bold;
+            font-size: 0.95rem;
+            font-weight: 600;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 8px;
             transition: background 0.2s, transform 0.1s;
         }
 
         button:hover { background-color: #357abd; }
         button:active { transform: scale(0.98); }
-        button.secondary { background-color: #555; margin-top: 5px; font-size: 0.9rem; padding: 10px; }
-        
+        button.secondary { background-color: #333; margin-top: 0; font-size: 0.85rem; padding: 10px; border: 1px solid #444; }
+        button.secondary:hover { background-color: #444; }
+
         button.share-btn { background-color: #2e7d32; display: none; } 
 
         input[type="file"] { display: none; }
         .file-upload {
             display: block;
-            padding: 15px;
-            border: 2px dashed #555;
+            padding: 12px;
+            background: #2a2a2a;
+            border: 1px dashed #555;
             text-align: center;
             border-radius: 8px;
             cursor: pointer;
             color: #ccc;
-            transition: border-color 0.2s;
+            font-size: 0.9rem;
+            transition: all 0.2s;
         }
-        .file-upload:hover { border-color: var(--primary); color: white; }
+        .file-upload:hover { border-color: var(--primary); color: white; background: #333; }
 
-        .status { font-size: 0.85rem; color: #888; margin-top: 15px; text-align: center; }
+        .status { font-size: 0.8rem; color: #666; margin-top: 15px; text-align: center; }
+
+        /* --- Footer --- */
+        footer {
+            width: 100%;
+            padding: 20px;
+            background-color: var(--panel);
+            border-top: 1px solid var(--border);
+            text-align: center;
+            margin-top: auto;
+        }
+        
+        footer p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        footer a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+            border-bottom: 1px dotted #555;
+            margin: 0 5px;
+        }
+        
+        footer a:hover {
+            color: var(--primary);
+            border-bottom-style: solid;
+        }
 
         @media (max-width: 900px) {
             .container {
                 flex-direction: column-reverse; 
                 align-items: center;
+                gap: 20px;
             }
             .controls {
                 max-width: 100%; 
@@ -166,48 +224,53 @@
 </head>
 <body>
 
+<div class="main-wrapper">
     <h1>Daily Text Wallpaper</h1>
 
     <div class="container">
         <div class="controls">
             
-            <div class="input-group">
-                <label>Format</label>
-                <select id="formatSelect" onchange="draw()">
-                    <option value="mobile">Mobile (9:16)</option>
-                    <option value="desktop">Desktop (16:9)</option>
-                </select>
+            <div class="grid-row">
+                <div>
+                    <label>Format</label>
+                    <select id="formatSelect" onchange="draw()">
+                        <option value="mobile">Mobile (9:16)</option>
+                        <option value="desktop">Desktop (16:9)</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Font</label>
+                    <select id="fontSelect">
+                        <option value="Inter">Clean</option>
+                        <option value="Lora">Serif</option>
+                        <option value="Dancing Script">Script</option>
+                    </select>
+                </div>
             </div>
 
-            <div class="input-group">
-                <label>Font Style</label>
-                <select id="fontSelect" onchange="draw()">
-                    <option value="Inter">Modern (Clean)</option>
-                    <option value="Lora">Elegant (Serif)</option>
-                    <option value="Dancing Script">Handwritten (Fancy)</option>
-                </select>
+            <div class="grid-row">
+                <div>
+                    <label>Text Size <span id="textSizeLabel" style="font-weight:normal;">36</span></label>
+                    <input type="range" id="textSizeRange" min="20" max="150" step="1" value="36">
+                </div>
+                <div>
+                    <label>Darkness <span id="overlayLabel" style="font-weight:normal;">40%</span></label>
+                    <input type="range" id="overlayRange" min="0" max="0.9" step="0.1" value="0.4">
+                </div>
             </div>
 
+            <hr style="border: 0; border-top: 1px solid #333; margin: 15px 0;">
+
             <div class="input-group">
-                <label>1. Background</label>
-                <label for="imgUpload" class="file-upload">Tap to Upload Image 📷</label>
+                <label>Background Image</label>
+                <label for="imgUpload" class="file-upload">📂 Tap to Change Image</label>
                 <input type="file" id="imgUpload" accept="image/*">
             </div>
 
             <div class="input-group">
-                <label>2. Text</label>
-                <textarea id="textInput" placeholder="Loading text..."></textarea>
-                <button class="secondary" onclick="fetchDailyText()">🔄 Refresh Daily Text</button>
-            </div>
-
-            <div class="input-group">
-                <label>Text Size <span id="textSizeLabel" style="font-weight:normal; color:#666;">36px</span></label>
-                <input type="range" id="textSizeRange" min="20" max="150" step="1" value="36">
-            </div>
-
-            <div class="input-group">
-                <label>Overlay Darkness</label>
-                <input type="range" id="overlayRange" min="0" max="0.9" step="0.1" value="0.4">
+                <label>The Text</label>
+                <textarea id="textInput" placeholder="Loading text..." style="min-height: 80px;"></textarea>
+                <button class="secondary" onclick="fetchDailyText()">🔄 Update Text</button>
             </div>
 
             <button id="shareBtn" class="share-btn" onclick="shareWallpaper()">Share Wallpaper 📤</button>
@@ -220,53 +283,78 @@
             <canvas id="wallpaperCanvas"></canvas>
         </div>
     </div>
+</div>
 
-    <script>
-        const canvas = document.getElementById('wallpaperCanvas');
-        const ctx = canvas.getContext('2d');
-        const textInput = document.getElementById('textInput');
-        const imgUpload = document.getElementById('imgUpload');
-        const overlayRange = document.getElementById('overlayRange');
-        const textSizeRange = document.getElementById('textSizeRange');
-        const textSizeLabel = document.getElementById('textSizeLabel');
-        const statusMsg = document.getElementById('statusMsg');
-        const formatSelect = document.getElementById('formatSelect');
-        const fontSelect = document.getElementById('fontSelect');
-        const shareBtn = document.getElementById('shareBtn');
+<footer>
+    <p>
+        Questions or Feedback? 
+        <br>
+        <a href="mailto:Daily-Text-Wallpaper@stitchtec.dev">Email</a>
+        &nbsp; • &nbsp;
+        <a href="https://stitchtec.dev/" target="_blank">Website</a>
+    </p>
+</footer>
+
+<script>
+    const canvas = document.getElementById('wallpaperCanvas');
+    const ctx = canvas.getContext('2d');
+    const textInput = document.getElementById('textInput');
+    const imgUpload = document.getElementById('imgUpload');
+    const overlayRange = document.getElementById('overlayRange');
+    const overlayLabel = document.getElementById('overlayLabel');
+    const textSizeRange = document.getElementById('textSizeRange');
+    const textSizeLabel = document.getElementById('textSizeLabel');
+    const statusMsg = document.getElementById('statusMsg');
+    const formatSelect = document.getElementById('formatSelect');
+    const fontSelect = document.getElementById('fontSelect');
+    const shareBtn = document.getElementById('shareBtn');
+    
+    let currentImage = new Image();
+    currentImage.crossOrigin = "Anonymous"; 
+    
+    currentImage.onload = function() {
+        draw();
+    };
+    currentImage.src = 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1920&auto=format&fit=crop'; 
+
+    if (navigator.share) {
+        shareBtn.style.display = "block";
+    }
+
+    // --- ROBUST FETCH SYSTEM ---
+    async function fetchDailyText() {
+        statusMsg.innerText = "Connecting...";
         
-        let currentImage = new Image();
-        currentImage.crossOrigin = "Anonymous"; 
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
         
-        // Listen for image load independently
-        currentImage.onload = function() {
-            draw();
-        };
-        // Set Source
-        currentImage.src = 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1920&auto=format&fit=crop'; 
+        const targetUrl = `https://b.jw-cdn.org/apis/wtlib/v1/get-daily-text?year=${year}&month=${month}&day=${day}&langwritten=E&output=json`;
+        
+        // The Cascade: List of proxies to try in order
+        const proxies = [
+            // Proxy 1: CorsProxy.io (Usually fastest)
+            { url: (target) => `https://corsproxy.io/?${encodeURIComponent(target)}`, name: "Primary" },
+            // Proxy 2: AllOrigins (Reliable backup)
+            { url: (target) => `https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`, name: "Backup" },
+            // Proxy 3: CodeTabs (Last resort)
+            { url: (target) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(target)}`, name: "Fallback" }
+        ];
 
-        if (navigator.share) {
-            shareBtn.style.display = "block";
-        }
+        let success = false;
 
-        // 1. Fetch Daily Text
-        async function fetchDailyText() {
-            statusMsg.innerText = "Connecting...";
-            textInput.value = "Loading...";
+        for (const proxy of proxies) {
+            if (success) break;
             
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, '0');
-            const day = String(today.getDate()).padStart(2, '0');
-            
-            const targetUrl = `https://b.jw-cdn.org/apis/wtlib/v1/get-daily-text?year=${year}&month=${month}&day=${day}&langwritten=E&output=json`;
-            const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`;
-
             try {
-                const response = await fetch(proxyUrl);
-                if (!response.ok) throw new Error("Proxy failed");
-                const data = await response.json();
+                textInput.value = `Connecting via ${proxy.name} relay...`;
+                const response = await fetch(proxy.url(targetUrl));
                 
-                const entry = data.items ? data.items[0] : data;
+                if (!response.ok) throw new Error("Status " + response.status);
+                
+                const data = await response.json();
+                const entry = data.items ? data.items[0] : data; // Handle data variations
                 
                 if (entry && entry.content) {
                     const txt = document.createElement("textarea");
@@ -275,184 +363,195 @@
 
                     textInput.value = `"${cleanText}"\n\n—${entry.citation}`;
                     statusMsg.innerText = "Daily text loaded!";
+                    statusMsg.style.color = "green";
                     draw();
-                } else {
-                    throw new Error("Data empty");
+                    success = true; // Stop loop
                 }
-            } catch (error) {
-                console.warn("Fetch failed, loading fallback.");
-                textInput.value = "“Your word is a lamp to my foot, and a light to my path.”\n\n—Psalm 119:105";
-                statusMsg.innerText = "Loaded sample text (Network blocked).";
-                statusMsg.style.color = "orange";
-                draw();
-            }
-        }
-
-        // 2. Image Upload
-        imgUpload.addEventListener('change', function(e) {
-            if(e.target.files && e.target.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    const img = new Image();
-                    img.onload = function() {
-                        currentImage = img;
-                        draw();
-                    }
-                    img.src = evt.target.result;
-                }
-                reader.readAsDataURL(e.target.files[0]);
-            }
-        });
-
-        // 3. Draw Function
-        function draw() {
-            // Safety check if image isn't loaded yet
-            if (!currentImage.complete && currentImage.src) {
-                return; // Wait for onload
-            }
-
-            const format = formatSelect.value;
-            const fontName = fontSelect.value;
-            
-            if (format === 'desktop') {
-                canvas.width = 1920;
-                canvas.height = 1080;
-            } else {
-                canvas.width = 1080;
-                canvas.height = 1920;
-            }
-
-            // Draw Image
-            const ratio = Math.max(canvas.width / currentImage.width, canvas.height / currentImage.height);
-            const centerShift_x = (canvas.width - currentImage.width * ratio) / 2;
-            const centerShift_y = (canvas.height - currentImage.height * ratio) / 2;
-            
-            ctx.drawImage(currentImage, 0, 0, currentImage.width, currentImage.height,
-                          centerShift_x, centerShift_y, currentImage.width * ratio, currentImage.height * ratio);
-
-            // Draw Overlay
-            ctx.fillStyle = `rgba(0, 0, 0, ${overlayRange.value})`;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Draw Text
-            const text = textInput.value;
-            const fontSize = parseInt(textSizeRange.value);
-            textSizeLabel.innerText = fontSize + "px"; 
-
-            ctx.font = `bold ${fontSize}px '${fontName}', sans-serif`;
-            ctx.fillStyle = "white";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            
-            ctx.shadowColor = "rgba(0,0,0,0.8)";
-            ctx.shadowBlur = 20;
-            ctx.shadowOffsetX = 5;
-            ctx.shadowOffsetY = 5;
-
-            const maxTextWidth = format === 'desktop' ? 1200 : canvas.width - 200;
-            wrapText(ctx, text, canvas.width / 2, canvas.height / 2, maxTextWidth, fontSize * 1.5);
-        }
-
-        // Robust Wrap Function (Preserves newlines)
-        function wrapText(context, text, x, y, maxWidth, lineHeight) {
-            const paragraphs = text.split(/\r\n|\r|\n/);
-            let allLines = [];
-
-            for (let i = 0; i < paragraphs.length; i++) {
-                const paragraph = paragraphs[i];
-                if (paragraph.trim() === '') {
-                    allLines.push('');
-                    continue;
-                }
-                const words = paragraph.split(' ');
-                let line = '';
-
-                for(let n = 0; n < words.length; n++) {
-                    const testLine = line + words[n] + ' ';
-                    const metrics = context.measureText(testLine);
-                    if (metrics.width > maxWidth && n > 0) {
-                        allLines.push(line);
-                        line = words[n] + ' ';
-                    } else {
-                        line = testLine;
-                    }
-                }
-                allLines.push(line);
-            }
-
-            const totalHeight = allLines.length * lineHeight;
-            let startY = y - (totalHeight / 2) + (lineHeight / 2);
-
-            for(let k = 0; k < allLines.length; k++) {
-                context.fillText(allLines[k], x, startY + (k * lineHeight));
-            }
-        }
-
-        // 4. Download
-        function downloadWallpaper() {
-            try {
-                const imageUrl = canvas.toDataURL("image/jpeg", 0.9);
-                const link = document.createElement('a');
-                link.download = `daily_text_${formatSelect.value}_${new Date().toISOString().slice(0,10)}.jpg`;
-                link.href = imageUrl;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                statusMsg.innerText = "Downloaded!";
             } catch (e) {
-                fallbackOpen();
+                console.warn(`${proxy.name} failed:`, e);
+                // Loop continues to next proxy...
             }
         }
 
-        // 5. Share
-        async function shareWallpaper() {
-            statusMsg.innerText = "Preparing to share...";
-            try {
-                canvas.toBlob(async (blob) => {
-                    if (!blob) return;
-                    const file = new File([blob], "daily_text_wallpaper.jpg", { type: "image/jpeg" });
-                    
-                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                        await navigator.share({
-                            files: [file],
-                            title: 'Daily Text Wallpaper',
-                            text: 'Here is the daily text wallpaper I created!',
-                        });
-                        statusMsg.innerText = "Shared successfully!";
-                    } else {
-                        throw new Error("Sharing not supported");
-                    }
-                }, 'image/jpeg', 0.9);
-            } catch (error) {
-                downloadWallpaper();
+        if (!success) {
+            // If ALL proxies fail
+            textInput.value = "Could not auto-load text.\n\nThe firewall might be blocking our relays today.\n\nPlease copy/paste the text here manually.";
+            statusMsg.innerText = "Connection failed. Please paste text.";
+            statusMsg.style.color = "orange";
+            draw();
+        }
+    }
+
+    // 2. Image Upload
+    imgUpload.addEventListener('change', function(e) {
+        if(e.target.files && e.target.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const img = new Image();
+                img.onload = function() {
+                    currentImage = img;
+                    draw();
+                }
+                img.src = evt.target.result;
             }
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
+
+    // 3. Draw Function
+    function draw() {
+        if (!currentImage.complete && currentImage.src) return; 
+
+        const format = formatSelect.value;
+        const fontName = fontSelect.value;
+        
+        // Update Labels
+        textSizeLabel.innerText = textSizeRange.value;
+        overlayLabel.innerText = Math.round(overlayRange.value * 100) + "%";
+
+        // Set Canvas Size
+        if (format === 'desktop') {
+            canvas.width = 1920;
+            canvas.height = 1080;
+        } else {
+            canvas.width = 1080;
+            canvas.height = 1920;
         }
 
-        function fallbackOpen() {
-            statusMsg.innerText = "Opened in new tab (Long Press to save)";
+        // Draw Image
+        const ratio = Math.max(canvas.width / currentImage.width, canvas.height / currentImage.height);
+        const centerShift_x = (canvas.width - currentImage.width * ratio) / 2;
+        const centerShift_y = (canvas.height - currentImage.height * ratio) / 2;
+        
+        ctx.drawImage(currentImage, 0, 0, currentImage.width, currentImage.height,
+                      centerShift_x, centerShift_y, currentImage.width * ratio, currentImage.height * ratio);
+
+        // Draw Overlay
+        ctx.fillStyle = `rgba(0, 0, 0, ${overlayRange.value})`;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Draw Text
+        const text = textInput.value;
+        const fontSize = parseInt(textSizeRange.value);
+
+        ctx.font = `bold ${fontSize}px '${fontName}', sans-serif`;
+        ctx.fillStyle = "white";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        
+        ctx.shadowColor = "rgba(0,0,0,0.8)";
+        ctx.shadowBlur = 20;
+        ctx.shadowOffsetX = 5;
+        ctx.shadowOffsetY = 5;
+
+        const maxTextWidth = format === 'desktop' ? 1200 : canvas.width - 200;
+        wrapText(ctx, text, canvas.width / 2, canvas.height / 2, maxTextWidth, fontSize * 1.5);
+    }
+
+    // Wrap Function
+    function wrapText(context, text, x, y, maxWidth, lineHeight) {
+        const paragraphs = text.split(/\r\n|\r|\n/);
+        let allLines = [];
+
+        for (let i = 0; i < paragraphs.length; i++) {
+            const paragraph = paragraphs[i];
+            if (paragraph.trim() === '') {
+                allLines.push('');
+                continue;
+            }
+            const words = paragraph.split(' ');
+            let line = '';
+
+            for(let n = 0; n < words.length; n++) {
+                const testLine = line + words[n] + ' ';
+                const metrics = context.measureText(testLine);
+                if (metrics.width > maxWidth && n > 0) {
+                    allLines.push(line);
+                    line = words[n] + ' ';
+                } else {
+                    line = testLine;
+                }
+            }
+            allLines.push(line);
+        }
+
+        const totalHeight = allLines.length * lineHeight;
+        let startY = y - (totalHeight / 2) + (lineHeight / 2);
+
+        for(let k = 0; k < allLines.length; k++) {
+            context.fillText(allLines[k], x, startY + (k * lineHeight));
+        }
+    }
+
+    // 4. Download
+    function downloadWallpaper() {
+        try {
             const imageUrl = canvas.toDataURL("image/jpeg", 0.9);
-            const win = window.open();
-            win.document.write('<body style="margin:0; background:#111; display:flex; justify-content:center; align-items:center; height:100vh;">');
-            win.document.write('<img src="' + imageUrl + '" style="max-width:100%; max-height:100%; box-shadow:0 0 20px black;"/>');
-            win.document.write('</body>');
+            const link = document.createElement('a');
+            link.download = `daily_text_${formatSelect.value}_${new Date().toISOString().slice(0,10)}.jpg`;
+            link.href = imageUrl;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            statusMsg.innerText = "Downloaded!";
+        } catch (e) {
+            fallbackOpen();
         }
+    }
 
-        // Listeners
-        textInput.addEventListener('input', draw);
-        overlayRange.addEventListener('input', draw);
-        textSizeRange.addEventListener('input', draw);
-        fontSelect.addEventListener('change', draw);
-        
-        // --- INITIALIZATION ---
-        
-        // 1. Start fetching text immediately (Don't wait for images/fonts)
-        fetchDailyText();
+    // 5. Share
+    async function shareWallpaper() {
+        statusMsg.innerText = "Preparing to share...";
+        try {
+            canvas.toBlob(async (blob) => {
+                if (!blob) return;
+                const file = new File([blob], "daily_text_wallpaper.jpg", { type: "image/jpeg" });
+                
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        files: [file],
+                        title: 'Daily Text Wallpaper',
+                        text: 'Here is the daily text wallpaper I created!',
+                    });
+                    statusMsg.innerText = "Shared successfully!";
+                } else {
+                    throw new Error("Sharing not supported");
+                }
+            }, 'image/jpeg', 0.9);
+        } catch (error) {
+            downloadWallpaper();
+        }
+    }
 
-        // 2. Ensure fonts update the canvas when they are finally ready
-        document.fonts.ready.then(function () {
-             draw();
+    function fallbackOpen() {
+        statusMsg.innerText = "Opened in new tab (Long Press to save)";
+        const imageUrl = canvas.toDataURL("image/jpeg", 0.9);
+        const win = window.open();
+        win.document.write('<body style="margin:0; background:#111; display:flex; justify-content:center; align-items:center; height:100vh;">');
+        win.document.write('<img src="' + imageUrl + '" style="max-width:100%; max-height:100%; box-shadow:0 0 20px black;"/>');
+        win.document.write('</body>');
+    }
+
+    // Listeners
+    textInput.addEventListener('input', draw);
+    overlayRange.addEventListener('input', draw);
+    textSizeRange.addEventListener('input', draw);
+    formatSelect.addEventListener('change', draw);
+    
+    // FONT FIX
+    fontSelect.addEventListener('change', function() {
+        const font = this.value;
+        document.fonts.load(`bold 40px '${font}'`).then(() => {
+            draw();
         });
+    });
 
-    </script>
+    // Init
+    fetchDailyText();
+    document.fonts.ready.then(function () {
+         draw();
+    });
+
+</script>
 </body>
 </html>
