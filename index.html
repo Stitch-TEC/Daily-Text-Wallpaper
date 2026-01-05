@@ -31,7 +31,6 @@
             padding: 0; 
         }
 
-        /* Wrapper to push footer down */
         .main-wrapper {
             flex: 1;
             width: 100%;
@@ -86,7 +85,6 @@
             border: 1px solid #333;
         }
 
-        /* --- Input Elements --- */
         .input-group { margin-bottom: 15px; }
         
         .grid-row {
@@ -139,6 +137,25 @@
             outline: none;
             cursor: pointer;
         }
+        
+        /* Checkbox Style */
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #2a2a2a;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
 
         button {
             width: 100%;
@@ -175,8 +192,6 @@
             transition: all 0.2s;
         }
         .file-upload:hover { border-color: var(--primary); color: white; background: #333; }
-
-        .status { font-size: 0.8rem; color: #666; margin-top: 15px; text-align: center; }
 
         /* --- Footer --- */
         footer {
@@ -259,6 +274,11 @@
                 </div>
             </div>
 
+            <div class="checkbox-wrapper">
+                <input type="checkbox" id="showDate" onchange="draw()">
+                <label for="showDate" style="margin:0; text-transform:none; color: white; cursor:pointer;">Include Date on Wallpaper</label>
+            </div>
+
             <hr style="border: 0; border-top: 1px solid #333; margin: 15px 0;">
 
             <div class="input-group">
@@ -276,7 +296,6 @@
             <button id="shareBtn" class="share-btn" onclick="shareWallpaper()">Share Wallpaper 📤</button>
             <button onclick="downloadWallpaper()">Download Wallpaper ⬇</button>
             
-            <div class="status" id="statusMsg">Ready</div>
         </div>
 
         <div class="preview-area">
@@ -304,10 +323,10 @@
     const overlayLabel = document.getElementById('overlayLabel');
     const textSizeRange = document.getElementById('textSizeRange');
     const textSizeLabel = document.getElementById('textSizeLabel');
-    const statusMsg = document.getElementById('statusMsg');
     const formatSelect = document.getElementById('formatSelect');
     const fontSelect = document.getElementById('fontSelect');
     const shareBtn = document.getElementById('shareBtn');
+    const showDateCheckbox = document.getElementById('showDate'); // New Toggle
     
     let currentImage = new Image();
     currentImage.crossOrigin = "Anonymous"; 
@@ -321,63 +340,84 @@
         shareBtn.style.display = "block";
     }
 
-    // --- ROBUST FETCH SYSTEM ---
+    // --- SMART CASCADING SCRAPER ---
     async function fetchDailyText() {
-        statusMsg.innerText = "Connecting...";
+        textInput.value = "Fetching today's text...";
         
         const today = new Date();
         const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
+        const month = today.getMonth() + 1; 
+        const day = today.getDate();
+
+        // The Page to Scrape
+        const targetUrl = `https://wol.jw.org/en/wol/dt/r1/lp-e/${year}/${month}/${day}`;
         
-        const targetUrl = `https://b.jw-cdn.org/apis/wtlib/v1/get-daily-text?year=${year}&month=${month}&day=${day}&langwritten=E&output=json`;
-        
-        // The Cascade: List of proxies to try in order
         const proxies = [
-            // Proxy 1: CorsProxy.io (Usually fastest)
-            { url: (target) => `https://corsproxy.io/?${encodeURIComponent(target)}`, name: "Primary" },
-            // Proxy 2: AllOrigins (Reliable backup)
-            { url: (target) => `https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`, name: "Backup" },
-            // Proxy 3: CodeTabs (Last resort)
-            { url: (target) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(target)}`, name: "Fallback" }
+            { 
+                name: "CorsProxy", 
+                url: `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`,
+                type: 'html' 
+            },
+            { 
+                name: "AllOrigins", 
+                url: `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`,
+                type: 'json' 
+            },
+            { 
+                name: "CodeTabs", 
+                url: `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`,
+                type: 'html' 
+            }
         ];
 
         let success = false;
 
         for (const proxy of proxies) {
-            if (success) break;
-            
-            try {
-                textInput.value = `Connecting via ${proxy.name} relay...`;
-                const response = await fetch(proxy.url(targetUrl));
-                
-                if (!response.ok) throw new Error("Status " + response.status);
-                
-                const data = await response.json();
-                const entry = data.items ? data.items[0] : data; // Handle data variations
-                
-                if (entry && entry.content) {
-                    const txt = document.createElement("textarea");
-                    txt.innerHTML = entry.content.replace(/<[^>]*>?/gm, '');
-                    const cleanText = txt.value;
+            if (success) break; 
 
-                    textInput.value = `"${cleanText}"\n\n—${entry.citation}`;
-                    statusMsg.innerText = "Daily text loaded!";
-                    statusMsg.style.color = "green";
-                    draw();
-                    success = true; // Stop loop
+            try {
+                const response = await fetch(proxy.url);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                let htmlString = "";
+                if (proxy.type === 'json') {
+                    const data = await response.json();
+                    htmlString = data.contents;
+                } else {
+                    htmlString = await response.text();
                 }
+
+                if (!htmlString || htmlString.length < 50) throw new Error("Empty response");
+
+                // --- PARSE ---
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlString, "text/html");
+
+                const themeNode = doc.querySelector(".themeScrp") || doc.querySelector("p.sa");
+                let themeText = themeNode ? themeNode.textContent.trim() : "";
+
+                const bodyNode = doc.querySelector(".bodyTxt") || doc.querySelector(".sb");
+                let bodyText = bodyNode ? bodyNode.textContent.trim() : "";
+
+                if (themeText && bodyText) {
+                    themeText = themeText.replace(/^\w+,\s\w+\s\d+/, '').trim();
+                    
+                    // FIXED: Removed Quotes from themeText
+                    textInput.value = `${themeText}\n\n${bodyText}`;
+                    
+                    draw();
+                    success = true;
+                } else {
+                    throw new Error("Could not find text elements");
+                }
+
             } catch (e) {
                 console.warn(`${proxy.name} failed:`, e);
-                // Loop continues to next proxy...
             }
         }
 
         if (!success) {
-            // If ALL proxies fail
-            textInput.value = "Could not auto-load text.\n\nThe firewall might be blocking our relays today.\n\nPlease copy/paste the text here manually.";
-            statusMsg.innerText = "Connection failed. Please paste text.";
-            statusMsg.style.color = "orange";
+            textInput.value = "Could not auto-load text.\n\nThe firewall is blocking connections.\n\nPlease copy/paste the text manually.";
             draw();
         }
     }
@@ -405,7 +445,6 @@
         const format = formatSelect.value;
         const fontName = fontSelect.value;
         
-        // Update Labels
         textSizeLabel.innerText = textSizeRange.value;
         overlayLabel.innerText = Math.round(overlayRange.value * 100) + "%";
 
@@ -430,21 +469,45 @@
         ctx.fillStyle = `rgba(0, 0, 0, ${overlayRange.value})`;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Draw Text
-        const text = textInput.value;
+        // --- NEW: Draw Date if Checked ---
         const fontSize = parseInt(textSizeRange.value);
-
-        ctx.font = `bold ${fontSize}px '${fontName}', sans-serif`;
         ctx.fillStyle = "white";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        
         ctx.shadowColor = "rgba(0,0,0,0.8)";
         ctx.shadowBlur = 20;
         ctx.shadowOffsetX = 5;
         ctx.shadowOffsetY = 5;
 
+        // Base font setup
+        ctx.font = `bold ${fontSize}px '${fontName}', sans-serif`;
+
+        if (showDateCheckbox.checked) {
+            // Format Today's Date
+            const dateStr = new Date().toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            // Draw Date at the top (15% down from top)
+            const dateSize = Math.max(24, fontSize * 0.7); // Slightly smaller than main text
+            ctx.font = `bold ${dateSize}px '${fontName}', sans-serif`;
+            
+            // Adjust header position based on format
+            const headerY = format === 'desktop' ? canvas.height * 0.12 : canvas.height * 0.10;
+            ctx.fillText(dateStr, canvas.width / 2, headerY);
+            
+            // Reset font for body text
+            ctx.font = `bold ${fontSize}px '${fontName}', sans-serif`;
+        }
+
+        // Draw Main Text
+        const text = textInput.value;
         const maxTextWidth = format === 'desktop' ? 1200 : canvas.width - 200;
+        
+        // Wrap text in center
         wrapText(ctx, text, canvas.width / 2, canvas.height / 2, maxTextWidth, fontSize * 1.5);
     }
 
@@ -493,7 +556,6 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            statusMsg.innerText = "Downloaded!";
         } catch (e) {
             fallbackOpen();
         }
@@ -501,7 +563,6 @@
 
     // 5. Share
     async function shareWallpaper() {
-        statusMsg.innerText = "Preparing to share...";
         try {
             canvas.toBlob(async (blob) => {
                 if (!blob) return;
@@ -513,7 +574,6 @@
                         title: 'Daily Text Wallpaper',
                         text: 'Here is the daily text wallpaper I created!',
                     });
-                    statusMsg.innerText = "Shared successfully!";
                 } else {
                     throw new Error("Sharing not supported");
                 }
@@ -524,7 +584,6 @@
     }
 
     function fallbackOpen() {
-        statusMsg.innerText = "Opened in new tab (Long Press to save)";
         const imageUrl = canvas.toDataURL("image/jpeg", 0.9);
         const win = window.open();
         win.document.write('<body style="margin:0; background:#111; display:flex; justify-content:center; align-items:center; height:100vh;">');
