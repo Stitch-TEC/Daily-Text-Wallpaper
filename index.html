@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Text Wallpaper</title>
+    <title>Daily Text Wallpaper V10</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,6 +12,7 @@
     <style>
         :root {
             --primary: #4a90e2;
+            --primary-hover: #357abd;
             --bg: #121212;
             --panel: #1e1e1e;
             --text: #ffffff;
@@ -37,15 +38,15 @@
             flex-direction: column;
             align-items: center;
             padding: 20px;
-            max-width: 800px; /* Constrain width for linear layout */
+            max-width: 800px;
         }
 
         h1 { margin-bottom: 20px; font-size: 1.5rem; text-align: center; color: #ddd; letter-spacing: -0.5px; }
 
-        /* --- 1. SETTINGS CARD --- */
+        /* --- SETTINGS CARD --- */
         .settings-card {
             width: 100%;
-            max-width: 500px; /* Nice readable width */
+            max-width: 500px;
             background: var(--panel);
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.4);
@@ -77,10 +78,10 @@
             background: var(--tab-active);
         }
         
-        .tab-content { padding: 20px; display: none; }
+        .tab-content { padding: 25px; display: none; }
         .tab-content.active { display: block; }
 
-        /* --- 2. PREVIEW AREA --- */
+        /* --- PREVIEW AREA --- */
         .preview-area {
             width: 100%;
             display: flex;
@@ -97,7 +98,7 @@
             border: 1px solid #333;
         }
 
-        /* --- 3. ACTION AREA (Buttons) --- */
+        /* --- ACTION AREA --- */
         .action-card {
             width: 100%;
             max-width: 500px;
@@ -108,20 +109,25 @@
             text-align: center;
         }
 
-        /* Input Styling */
-        .input-group { margin-bottom: 15px; }
-        .grid-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        /* --- FORM ELEMENTS --- */
+        .input-group { margin-bottom: 20px; }
+        .grid-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
 
         label { 
-            display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.75rem; 
+            display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.75rem; 
             color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;
             display: flex; justify-content: space-between;
         }
         
         textarea, input[type="text"], select {
-            width: 100%; padding: 10px 12px; background: #2a2a2a; border: 1px solid var(--border);
+            width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid var(--border);
             color: white; border-radius: 8px; box-sizing: border-box; font-size: 14px; 
             font-family: inherit; transition: border 0.2s;
+        }
+
+        input[type="color"] {
+            width: 100%; height: 42px; padding: 2px; background: #2a2a2a;
+            border: 1px solid var(--border); border-radius: 8px; cursor: pointer;
         }
 
         textarea:focus, input:focus, select:focus { outline: none; border-color: var(--primary); background: #333; }
@@ -137,30 +143,36 @@
             color: white; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 600;
             cursor: pointer; margin-top: 8px; transition: background 0.2s, transform 0.1s;
         }
-
-        button:hover { background-color: #357abd; }
+        button:hover { background-color: var(--primary-hover); }
         button:active { transform: scale(0.98); }
-        button.secondary { background-color: #333; margin-top: 0; font-size: 0.85rem; padding: 10px; border: 1px solid #444; }
+        
+        button.secondary { background-color: #333; margin-top: 10px; font-size: 0.85rem; padding: 10px; border: 1px solid #444; }
         button.secondary:hover { background-color: #444; }
-
         button.share-btn { background-color: #2e7d32; display: none; } 
 
+        /* POPPING UPLOAD BUTTON */
         input[type="file"] { display: none; }
         .file-upload {
-            display: block; padding: 12px; background: #2a2a2a; border: 1px dashed #555;
-            text-align: center; border-radius: 8px; cursor: pointer; color: #ccc;
-            font-size: 0.9rem; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            padding: 20px; background: linear-gradient(145deg, #252525, #2a2a2a);
+            border: 2px dashed var(--primary); color: var(--primary);
+            font-weight: 700; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px;
+            border-radius: 12px; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 5px;
         }
-        .file-upload:hover { border-color: var(--primary); color: white; background: #333; }
+        .file-upload:hover {
+            background: var(--primary); color: white; border-color: var(--primary);
+            transform: translateY(-3px); box-shadow: 0 8px 20px rgba(74, 144, 226, 0.3);
+        }
+        .file-upload:active { transform: translateY(-1px); }
 
-        footer {
-            width: 100%; padding: 40px 20px; text-align: center; margin-top: auto;
-        }
+        .separator { width: 100%; height: 1px; background: #333; margin: 25px 0; }
+
+        footer { width: 100%; padding: 40px 20px; text-align: center; margin-top: auto; }
         footer p { font-size: 0.85rem; color: var(--text-muted); margin: 0; line-height: 1.5; }
         footer a { color: var(--text-muted); text-decoration: none; border-bottom: 1px dotted #555; margin: 0 5px; }
         footer a:hover { color: var(--primary); border-bottom-style: solid; }
         .disclaimer { font-size: 0.7rem; color: #555; margin-top: 15px; display: block; }
-
     </style>
 </head>
 <body>
@@ -176,7 +188,7 @@
 
         <div id="tab-content" class="tab-content active">
             <div class="input-group">
-                <label>Language 🌎</label>
+                <label>1. Select Language 🌎</label>
                 <select id="langSelect" onchange="fetchDailyText()">
                     <option value="en">English</option>
                     <option value="es">Español (Spanish)</option>
@@ -189,15 +201,15 @@
             </div>
 
             <div class="input-group">
-                <label>Background Image</label>
-                <label for="imgUpload" class="file-upload">📂 Tap to Change Image</label>
+                <label>2. Choose Background</label>
+                <label for="imgUpload" class="file-upload"><span>📸 Upload Photo</span></label>
                 <input type="file" id="imgUpload" accept="image/*">
             </div>
 
             <div class="input-group">
-                <label>The Text</label>
+                <label>3. Edit Text</label>
                 <textarea id="textInput" placeholder="Loading text..." style="min-height: 100px;"></textarea>
-                <button class="secondary" onclick="fetchDailyText()">🔄 Refresh Text</button>
+                <button class="secondary" onclick="fetchDailyText()">🔄 Refresh Daily Text</button>
             </div>
         </div>
 
@@ -227,19 +239,14 @@
                     <input type="range" id="textSizeRange" min="20" max="150" step="1" value="36">
                 </div>
                 <div>
-                    <label>Darkness <span id="overlayLabel" style="font-weight:normal;">40%</span></label>
-                    <input type="range" id="overlayRange" min="0" max="0.9" step="0.1" value="0.4">
+                    <label>Image Position ↕️</label>
+                    <input type="range" id="bgPosRange" min="0" max="100" step="1" value="50">
                 </div>
-            </div>
-
-            <div class="input-group">
-                <label>Background Position (Vertical) ↕️</label>
-                <input type="range" id="bgPosRange" min="0" max="100" step="1" value="50">
             </div>
 
             <div class="grid-row">
                 <div>
-                    <label>Date Position</label>
+                    <label>Date Label</label>
                     <select id="datePosSelect" onchange="draw()">
                         <option value="floating">Floating Top</option>
                         <option value="inline-top">Inline Top</option>
@@ -248,50 +255,63 @@
                     </select>
                 </div>
                 <div>
-                    <label>Align</label>
+                    <label>Alignment</label>
                      <select id="alignSelect" onchange="draw()">
                         <option value="center">Center</option>
                         <option value="left">Left</option>
                     </select>
                 </div>
             </div>
+
+            <div class="separator"></div>
+            <label style="margin-bottom:15px; color:white;">✨ Effects & Overlay</label>
+
+            <div class="input-group">
+                <label>Text Shadow ⚫</label>
+                <input type="range" id="shadowRange" min="0" max="50" step="1" value="20">
+            </div>
+
+            <div class="grid-row">
+                <div>
+                    <label>Overlay Color</label>
+                    <input type="color" id="overlayColorPicker" value="#000000">
+                </div>
+                <div>
+                    <label>Overlay Opacity <span id="overlayLabel" style="font-weight:normal;">40%</span></label>
+                    <input type="range" id="overlayRange" min="0" max="0.9" step="0.1" value="0.4">
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="preview-area">
-        <canvas id="wallpaperCanvas"></canvas>
-    </div>
+    <div class="preview-area"><canvas id="wallpaperCanvas"></canvas></div>
 
     <div class="action-card">
-        <label style="text-align:center; justify-content:center;">Ready to Save?</label>
-        <button id="shareBtn" class="share-btn" onclick="shareWallpaper()">Share Wallpaper 📤</button>
-        <button onclick="downloadWallpaper()">Download Wallpaper ⬇</button>
+        <label style="text-align:center; justify-content:center; margin-bottom:15px;">Ready to share?</label>
+        <button id="shareBtn" class="share-btn" onclick="shareWallpaper()">Share Image 📤</button>
+        <button onclick="downloadWallpaper()">Download Image ⬇</button>
     </div>
-
 </div>
 
 <footer>
-    <p>
-        Questions or Feedback? <br>
-        <a href="mailto:Daily-Text-Wallpaper@stitchtec.dev">Email</a> • <a href="https://stitchtec.dev/" target="_blank">Website</a>
-    </p>
-    <span class="disclaimer">
-        This is an unofficial personal tool. Daily Text content © Watch Tower Bible and Tract Society of Pennsylvania.
-    </span>
+    <p>Questions? <a href="mailto:Daily-Text-Wallpaper@stitchtec.dev">Email</a> • <a href="https://stitchtec.dev/" target="_blank">Website</a></p>
+    <span class="disclaimer">Unofficial tool. Daily Text content © Watch Tower Bible and Tract Society of Pennsylvania.</span>
 </footer>
 
 <script>
-    // Elements
     const canvas = document.getElementById('wallpaperCanvas');
     const ctx = canvas.getContext('2d');
     const textInput = document.getElementById('textInput');
     const imgUpload = document.getElementById('imgUpload');
     const shareBtn = document.getElementById('shareBtn');
     
-    // Controls
+    // Inputs
     const overlayRange = document.getElementById('overlayRange');
+    const overlayColorPicker = document.getElementById('overlayColorPicker');
     const textSizeRange = document.getElementById('textSizeRange');
     const bgPosRange = document.getElementById('bgPosRange');
+    const shadowRange = document.getElementById('shadowRange'); 
+    
     const formatSelect = document.getElementById('formatSelect');
     const fontSelect = document.getElementById('fontSelect');
     const langSelect = document.getElementById('langSelect');
@@ -301,7 +321,6 @@
     const overlayLabel = document.getElementById('overlayLabel');
     const textSizeLabel = document.getElementById('textSizeLabel');
     
-    // CONFIG with Japanese Support
     const LANG_CONFIG = {
         'en': { region: 'r1', code: 'lp-e', urlPart: 'en', locale: 'en-US' },
         'es': { region: 'r4', code: 'lp-s', urlPart: 'es', locale: 'es-ES' },
@@ -314,35 +333,23 @@
 
     let currentImage = new Image();
     currentImage.crossOrigin = "Anonymous"; 
-    
     currentImage.onload = function() { draw(); };
     currentImage.src = 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1920&auto=format&fit=crop'; 
 
     if (navigator.share) shareBtn.style.display = "block";
 
-    // --- TAB LOGIC ---
     window.openTab = function(tabName) {
-        const contents = document.getElementsByClassName("tab-content");
-        for (let i = 0; i < contents.length; i++) {
-            contents[i].style.display = "none";
-            contents[i].classList.remove("active");
-        }
-        const btns = document.getElementsByClassName("tab-btn");
-        for (let i = 0; i < btns.length; i++) {
-            btns[i].classList.remove("active");
-        }
+        Array.from(document.getElementsByClassName("tab-content")).forEach(c => { c.style.display = "none"; c.classList.remove("active"); });
+        Array.from(document.getElementsByClassName("tab-btn")).forEach(b => b.classList.remove("active"));
         document.getElementById(tabName).style.display = "block";
         document.getElementById(tabName).classList.add("active");
         event.currentTarget.classList.add("active");
     }
 
-    // --- SCRAPER ---
     async function fetchDailyText() {
         const lang = langSelect.value;
         const config = LANG_CONFIG[lang] || LANG_CONFIG['en'];
-        
         if(lang === 'ja') fontSelect.value = 'Noto Sans JP';
-
         textInput.value = "Fetching...";
         
         const today = new Date();
@@ -362,7 +369,6 @@
                 if (!res.ok) throw new Error();
                 let html = proxy.type === 'json' ? (await res.json()).contents : await res.text();
                 if (!html || html.length < 50) throw new Error();
-
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, "text/html");
                 let theme = doc.querySelector(".themeScrp")?.textContent.trim() || "";
@@ -371,23 +377,18 @@
                 if (theme && body) {
                     theme = theme.replace(/^[\w\u00C0-\u00FF\u3000-\u303F]+,\s[\w\u00C0-\u00FF\u3000-\u303F]+\s\d+/, '').trim();
                     textInput.value = `${theme}\n\n${body}`;
-                    draw();
-                    success = true;
+                    draw(); success = true;
                 }
-            } catch (e) { console.warn(e); }
+            } catch (e) {}
         }
         if (!success) { textInput.value = "Could not auto-load text.\nPlease copy/paste manually."; draw(); }
     }
 
-    // --- DRAW ---
+    // --- MAIN DRAW FUNCTION ---
     function draw() {
         if (!currentImage.complete && currentImage.src) return; 
 
         const format = formatSelect.value;
-        const fontName = fontSelect.value;
-        const datePos = datePosSelect.value;
-        const lang = langSelect.value;
-        const align = alignSelect.value;
         const bgPos = bgPosRange.value;
         
         textSizeLabel.innerText = textSizeRange.value;
@@ -395,68 +396,73 @@
 
         if (format === 'desktop') { canvas.width = 1920; canvas.height = 1080; } 
         else { canvas.width = 1080; canvas.height = 1920; }
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // --- DRAW IMAGE WITH OFFSET ---
+        // --- DRAW IMAGE ---
         const hRatio = canvas.width / currentImage.width;
         const vRatio = canvas.height / currentImage.height;
         const ratio = Math.max(hRatio, vRatio);
-        
         const imgW = currentImage.width * ratio;
         const imgH = currentImage.height * ratio;
-        
         const centerX = (canvas.width - imgW) / 2;
         const maxScroll = imgH - canvas.height; 
         
-        let shiftY = 0;
-        if (maxScroll > 0) {
-            const pct = bgPos / 100;
-            shiftY = -(maxScroll * pct); 
-        } else {
-            shiftY = (canvas.height - imgH) / 2;
-        }
-
-        ctx.drawImage(currentImage, 0, 0, currentImage.width, currentImage.height,
-                      centerX, shiftY, imgW, imgH);
-
-        // Overlay
-        ctx.fillStyle = `rgba(0, 0, 0, ${overlayRange.value})`;
+        let shiftY = maxScroll > 0 ? -(maxScroll * (bgPos / 100)) : (canvas.height - imgH) / 2;
+        ctx.drawImage(currentImage, 0, 0, currentImage.width, currentImage.height, centerX, shiftY, imgW, imgH);
+        
+        // --- COLORED OVERLAY ---
+        const hex = overlayColorPicker.value;
+        const r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${overlayRange.value})`;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // --- TEXT RENDERING ---
         const fontSize = parseInt(textSizeRange.value);
         ctx.fillStyle = "white";
         ctx.textBaseline = "middle";
-        ctx.shadowColor = "rgba(0,0,0,0.8)";
-        ctx.shadowBlur = 20;
-        ctx.shadowOffsetX = 5;
-        ctx.shadowOffsetY = 5;
-        ctx.font = `bold ${fontSize}px '${fontName}', sans-serif`;
+        
+        // Dynamic Shadow
+        const shadowVal = parseInt(shadowRange.value);
+        if(shadowVal > 0) {
+            ctx.shadowColor = "rgba(0,0,0,0.8)";
+            ctx.shadowBlur = shadowVal;
+            ctx.shadowOffsetX = shadowVal / 4;
+            ctx.shadowOffsetY = shadowVal / 4;
+        } else {
+            ctx.shadowColor = "transparent";
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+        }
 
-        const config = LANG_CONFIG[lang] || LANG_CONFIG['en'];
+        ctx.font = `bold ${fontSize}px '${fontSelect.value}', sans-serif`;
+
+        const config = LANG_CONFIG[langSelect.value] || LANG_CONFIG['en'];
         const dateStr = new Date().toLocaleDateString(config.locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         
         let mainText = textInput.value;
+        let datePos = datePosSelect.value;
+
         if (datePos === 'floating') {
             ctx.textAlign = "center"; 
             const dateSize = Math.max(24, fontSize * 0.7);
-            ctx.font = `bold ${dateSize}px '${fontName}', sans-serif`;
+            ctx.font = `bold ${dateSize}px '${fontSelect.value}', sans-serif`;
             const headerY = format === 'desktop' ? canvas.height * 0.12 : canvas.height * 0.10;
             ctx.fillText(dateStr, canvas.width / 2, headerY);
-            ctx.font = `bold ${fontSize}px '${fontName}', sans-serif`;
+            ctx.font = `bold ${fontSize}px '${fontSelect.value}', sans-serif`;
         } else if (datePos === 'inline-top') {
             mainText = `${dateStr}\n\n${mainText}`;
         } else if (datePos === 'inline-bottom') {
             mainText = `${mainText}\n\n${dateStr}`;
         }
 
-        ctx.textAlign = align; 
-        let xPos = canvas.width / 2;
-        if (align === 'left') {
-            xPos = format === 'desktop' ? 100 : 80;
-        }
+        ctx.textAlign = alignSelect.value; 
+        let xPos = alignSelect.value === 'left' ? (format === 'desktop' ? 100 : 80) : canvas.width / 2;
         const maxTextWidth = format === 'desktop' ? 1200 : canvas.width - 160;
         
-        wrapText(ctx, mainText, xPos, canvas.height / 2, maxTextWidth, fontSize * 1.5, lang);
+        wrapText(ctx, mainText, xPos, canvas.height / 2, maxTextWidth, fontSize * 1.5, langSelect.value);
     }
 
     function wrapText(context, text, x, y, maxWidth, lineHeight, lang) {
@@ -478,10 +484,8 @@
             }
             allLines.push(line);
         }
-
         const totalHeight = allLines.length * lineHeight;
         let startY = y - (totalHeight / 2) + (lineHeight / 2);
-
         for(let k = 0; k < allLines.length; k++) {
             context.fillText(allLines[k], x, startY + (k * lineHeight));
         }
@@ -524,7 +528,7 @@
         win.document.write('<body style="margin:0;background:#111;display:flex;justify-content:center;align-items:center;height:100vh;"><img src="' + canvas.toDataURL("image/jpeg", 0.9) + '" style="max-width:100%;max-height:100%;box-shadow:0 0 20px black;"/></body>');
     }
 
-    [textInput, overlayRange, textSizeRange, bgPosRange, formatSelect, datePosSelect, alignSelect].forEach(el => el.addEventListener('input', draw));
+    [textInput, overlayRange, overlayColorPicker, textSizeRange, bgPosRange, shadowRange, formatSelect, datePosSelect, alignSelect].forEach(el => el.addEventListener('input', draw));
     fontSelect.addEventListener('change', function() { document.fonts.load(`bold 40px '${this.value}'`).then(() => draw()); });
     langSelect.addEventListener('change', fetchDailyText);
 
